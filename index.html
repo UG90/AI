@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition</title>
+    <style>
+        /* Basic styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #output {
+            margin-top: 20px;
+            font-size: 18px;
+            min-height: 100px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Speech Recognition Demo</h1>
+    </header>
+    <button id="startButton">Start Speech Recognition</button>
+    <div id="output"></div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        const startButton = document.getElementById('startButton');
+
+        // Speech Recognition API
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = function () {
+            outputDiv.innerHTML = 'Listening...';
+        };
+
+        recognition.onerror = function (event) {
+            outputDiv.innerHTML = 'Error occurred in recognition: ' + event.error;
+        };
+
+        recognition.onresult = function (event) {
+            const last = event.results.length - 1;
+            const transcript = event.results[last][0].transcript;
+            const confidence = event.results[last][0].confidence;
+
+            outputDiv.innerHTML = '<b>Result:</b> ' + transcript + '<br><b>Confidence:</b> ' + confidence.toFixed(2);
+        };
+
+        startButton.onclick = function () {
+            recognition.start();
+        };
+    </script>
+</body>
+</html>
