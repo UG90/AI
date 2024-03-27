@@ -73,9 +73,6 @@
     </div>
 
     <script>
-        // API keys (Replace these with your actual API keys)
-        const OPENAI_API_KEY = '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';
-        
         const outputDiv = document.getElementById('output');
         const answerDiv = document.getElementById('answer');
         const startButton = document.getElementById('startButton');
@@ -99,28 +96,26 @@
 
             outputDiv.innerHTML = '<b>Spoken Text:</b> ' + transcript;
 
-            // Send the transcript to the server for ChatGPT processing
-            fetch('/chatgpt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + OPENAI_API_KEY
-                },
-                body: JSON.stringify({ transcript })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const answer = data.answer;
-                answerDiv.innerHTML = '<b>Answer:</b> ' + answer;
+            // Send the transcript to the server for Wikipedia search
+            fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=' + encodeURIComponent(transcript))
+                .then(response => response.json())
+                .then(data => {
+                    const searchResult = data.query.search[0]; // Take the first search result
+                    const snippet = searchResult.snippet;
 
-                // Speak the answer
-                const speechSynthesis = window.speechSynthesis;
-                const speechText = new SpeechSynthesisUtterance(answer);
-                speechSynthesis.speak(speechText);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                    // Remove HTML tags from the snippet
+                    const snippetWithoutTags = snippet.replace(/<\/?[^>]+(>|$)/g, "");
+
+                    answerDiv.innerHTML = '<b>Wikipedia Answer:</b> ' + snippetWithoutTags;
+
+                    // Speak the answer
+                    const speechSynthesis = window.speechSynthesis;
+                    const speechText = new SpeechSynthesisUtterance(snippetWithoutTags);
+                    speechSynthesis.speak(speechText);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         };
 
         startButton.onclick = function () {
