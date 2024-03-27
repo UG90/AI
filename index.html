@@ -18,7 +18,7 @@
             background-color: #333;
             color: #fff;
             padding: 20px;
-            text-align: center;
+            margin-bottom: 20px;
         }
 
         button {
@@ -28,8 +28,7 @@
             font-size: 16px;
             border: none;
             cursor: pointer;
-            margin: 20px auto;
-            display: block;
+            margin-bottom: 20px;
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
@@ -39,17 +38,25 @@
         }
 
         #output {
-            margin: 0 auto;
             margin-top: 20px;
             font-size: 18px;
             min-height: 100px;
-            width: 80%;
             border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
             background-color: #fff;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #answer {
+            margin-top: 20px;
+            font-size: 18px;
+            min-height: 100px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            background-color: #f0f0f0;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -59,9 +66,14 @@
     </header>
     <button id="startButton">Start Speech Recognition</button>
     <div id="output"></div>
+    <div id="answer"></div>
 
     <script>
+        // API keys (Replace these with your actual API keys)
+        const OPENAI_API_KEY = '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';
+        
         const outputDiv = document.getElementById('output');
+        const answerDiv = document.getElementById('answer');
         const startButton = document.getElementById('startButton');
 
         // Speech Recognition API
@@ -83,6 +95,23 @@
             const confidence = event.results[0][0].confidence;
 
             outputDiv.innerHTML = '<b>Result:</b> ' + transcript + '<br><b>Confidence:</b> ' + (confidence * 100).toFixed(2) + '%';
+
+            // Send the transcript to the server for ChatGPT processing
+            fetch('/chatgpt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + OPENAI_API_KEY
+                },
+                body: JSON.stringify({ transcript })
+            })
+            .then(response => response.json())
+            .then(data => {
+                answerDiv.innerHTML = '<b>Answer:</b> ' + data.answer;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         };
 
         startButton.onclick = function () {
