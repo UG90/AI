@@ -100,18 +100,21 @@
             fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=' + encodeURIComponent(transcript))
                 .then(response => response.json())
                 .then(data => {
-                    const searchResult = data.query.search[0]; // Take the first search result
-                    const snippet = searchResult.snippet;
+                    console.log(data); // Log the response data for debugging
 
-                    // Remove HTML tags from the snippet
-                    const snippetWithoutTags = snippet.replace(/<\/?[^>]+(>|$)/g, "");
+                    const searchResults = data.query.search;
+                    if (searchResults.length > 0) {
+                        const snippet = searchResults[0].snippet;
+                        const snippetWithoutTags = snippet.replace(/<\/?[^>]+(>|$)/g, "");
+                        answerDiv.innerHTML = '<b>Wikipedia Answer:</b> ' + snippetWithoutTags;
 
-                    answerDiv.innerHTML = '<b>Wikipedia Answer:</b> ' + snippetWithoutTags;
-
-                    // Speak the answer
-                    const speechSynthesis = window.speechSynthesis;
-                    const speechText = new SpeechSynthesisUtterance(snippetWithoutTags);
-                    speechSynthesis.speak(speechText);
+                        // Speak the answer
+                        const speechSynthesis = window.speechSynthesis;
+                        const speechText = new SpeechSynthesisUtterance(snippetWithoutTags);
+                        speechSynthesis.speak(speechText);
+                    } else {
+                        answerDiv.innerHTML = '<b>No Wikipedia answer found.</b>';
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
