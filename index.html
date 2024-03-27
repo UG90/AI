@@ -100,7 +100,7 @@
             fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=' + encodeURIComponent(transcript))
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error('Network response was not ok. Status code: ' + response.status);
                     }
                     return response.json();
                 })
